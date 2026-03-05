@@ -28,7 +28,10 @@ async def get_html(url):
     async with async_playwright() as p:
         # Note: Set headless=False if running locally to see the browser window
         browser = await p.chromium.launch(headless=True)
-        page = await browser.new_page()
+        # Use a standard user agent to avoid being blocked by sites like CNN
+        page = await browser.new_page(
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        )
         # Set a timeout and wait for DOM content to ensure basic structure is there
         # print(f"Navigating to {url}...", file=sys.stderr)
         try:
