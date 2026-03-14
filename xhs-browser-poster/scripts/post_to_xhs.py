@@ -27,6 +27,8 @@ async def run(image_path, title, content):
         page = await context.new_page()
         
         try:
+            content_without_tags, tags = parse_tags(content)
+
             print("Opening XHS image publish page directly...")
             await page.goto("https://creator.xiaohongshu.com/publish/publish?from=menu&target=image")
             await page.wait_for_load_state("networkidle")
@@ -43,7 +45,8 @@ async def run(image_path, title, content):
                 editor = await frame.query_selector("div#post-textarea, .content-input, [contenteditable='true']")
                 if editor:
                     await editor.click()
-                    await frame.evaluate(f"el => el.innerText = `{content}`", editor)
+                    # Only fill the content WITHOUT tags
+                    await frame.evaluate(f"el => el.innerText = `{content_without_tags}\n\n`", editor)
                     
                     await frame.evaluate("el => {"
                         "const range = document.createRange();"
@@ -55,15 +58,14 @@ async def run(image_path, title, content):
                         "el.focus();"
                     "}", editor)
                     
-                    print("Content filled and cursor moved to end.")
+                    print("Base content filled and cursor moved to end.")
                     found_editor = True
                     break
             
             if not found_editor:
                 print("Fallback fill via evaluate on main page")
-                await page.evaluate(f"document.querySelector('[contenteditable=\"true\"]').innerText = `{content}`")
+                await page.evaluate(f"document.querySelector('[contenteditable=\"true\"]').innerText = `{content_without_tags}\n\n`")
 
-            content_without_tags, tags = parse_tags(content)
             
             for tag in tags:
                 print(f"Adding tag: #{tag}")
