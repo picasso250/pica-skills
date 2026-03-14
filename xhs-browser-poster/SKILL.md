@@ -26,8 +26,8 @@ python scripts/generate_gemini_img.py "A cozy afternoon tea at a street cafe, na
 ### 2. XHS Posting & Verification
 Use `scripts/post_to_xhs.py` to publish and verify.
 - **Input**: Image path, Title, and Content.
-- **Workflow**: Navigates directly to the image publish page, uploads image, fills title/content (ensuring spaces after hashtags), clicks Publish, and navigates to the Note Manager.
-- **Output**: Prints `RESULT_SCREENSHOT_PATH:<path>` showing the post in the Note Manager.
+- **Workflow**: Navigates to the publish page, uploads image, fills title/content, clicks Publish, and then reloads the Note Manager to confirm the post's presence.
+- **Output**: Prints `VERIFICATION_SUCCESS` and a JSON string `RESULT_NOTES_DATA` containing titles in the manager.
 
 ```bash
 python scripts/post_to_xhs.py "image.jpg" "Title" "Content"
@@ -35,4 +35,4 @@ python scripts/post_to_xhs.py "image.jpg" "Title" "Content"
 
 ## Best Practices
 - **Hashtags**: Always ensure a space after each hashtag in the content string.
-- **Verification**: Always check the result screenshot to ensure the post is visible in the manager.
+- **Verification**: The script automatically verifies if the new post title exists in the Note Manager. Check the console output for `VERIFICATION_SUCCESS`.

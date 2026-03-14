@@ -5,11 +5,20 @@ import sys
 import re
 
 def parse_tags(content):
-    tags = re.findall(r'#(\S+)', content)
-    content_without_tags = re.sub(r'#\S+\s*', '', content).strip()
+    tags = []
+    parts = content.split()
+    i = len(parts) - 1
+    while i >= 0 and parts[i].startswith('#'):
+        tags.insert(0, parts[i][1:])
+        i -= 1
+    content_without_tags = ' '.join(parts[:i+1]).strip()
     return content_without_tags, tags
 
 async def run(image_path, title, content):
+    if len(title) > 20:
+        print(f"Error: Title '{title}' exceeds 20 characters (length: {len(title)}). Please provide a shorter title.")
+        return
+
     os.environ["NO_PROXY"] = "localhost,127.0.0.1"
     
     async with async_playwright() as p:
@@ -71,16 +80,49 @@ async def run(image_path, title, content):
             publish_btn = await page.wait_for_selector("button:has-text('发布')", timeout=5000)
             await publish_btn.click()
             print("Clicked publish button.")
-            await asyncio.sleep(10)
+            
+            # Wait a moment to catch any immediate validation error toasts
+            await asyncio.sleep(2)
+            
+            # Look for error messages on the page (e.g. "标题最多输入20字" or generic toast)
+            error_elements = await page.query_selector_all(".el-message--error, .toast, [class*='error'], .css-toast")
+            if error_elements:
+                for el in error_elements:
+                    # Make sure it's visible and has text
+                    if await el.is_visible():
+                        err_text = await el.inner_text()
+                        if err_text.strip():
+                            print(f"Error prompt detected: {err_text.strip()}")
+                            return
+            
+            await asyncio.sleep(8)
 
-            print("Navigating to Note Manager...")
+            print("Navigating to Note Manager for verification...")
             await page.goto("https://creator.xiaohongshu.com/new/note-manager")
+            await page.reload()
             await page.wait_for_load_state("networkidle")
             await asyncio.sleep(3)
             
-            screenshot_path = os.path.abspath("xhs_publish_proof.png")
-            await page.screenshot(path=screenshot_path)
-            print(f"RESULT_SCREENSHOT_PATH:{screenshot_path}")
+            # Use the extraction logic to verify
+            verification_script = """
+            () => {
+                const noteElements = document.querySelectorAll('.note');
+                return Array.from(noteElements).map(el => {
+                    const infoText = el.querySelector('.info')?.innerText || "";
+                    return { title: infoText.split('\\n')[0].trim() };
+                });
+            }
+            """
+            notes = await page.evaluate(verification_script)
+            
+            if notes:
+                import json
+                print("Latest Note in Manager (First Entry):")
+                print(json.dumps(notes[0], indent=2, ensure_ascii=False))
+                # Still output the full list for context if needed
+                print(f"RESULT_NOTES_DATA:{json.dumps(notes, ensure_ascii=False)}")
+            else:
+                print("VERIFICATION_INFO: No notes found in the Note Manager.")
 
         except Exception as e:
             print(f"Error in XHS script: {e}")
