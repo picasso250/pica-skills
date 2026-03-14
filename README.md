@@ -52,5 +52,25 @@ Gemini CLI 自动化工作流技能库。
 - Python 3.8+, 需开启 Chrome/Edge 远程调试端口 (`--remote-debugging-port=9222`)。
 - `pip install playwright beautifulsoup4`
 
+---
+
+## 🔧 AI Agent Installation Guide | AI Agent 安装指南
+
+English: Use the following commands to install skills directly into your Gemini CLI.
+中文: 使用以下命令将技能直接安装到您的 Gemini CLI。
+
+```bash
+# Example: Install url2md skill
+mkdir -p ~/.gemini/skills/url2md
+curl -L https://raw.githubusercontent.com/picasso250/pica-skills/main/url2md/SKILL.md -o ~/.gemini/skills/url2md/SKILL.md
+curl -L https://raw.githubusercontent.com/picasso250/pica-skills/main/url2md/url2md.py -o ~/.gemini/skills/url2md/url2md.py
+
+# Example: Install xhs-browser-poster skill
+mkdir -p ~/.gemini/skills/xhs-browser-poster/scripts
+curl -L https://raw.githubusercontent.com/picasso250/pica-skills/main/xhs-browser-poster/SKILL.md -o ~/.gemini/skills/xhs-browser-poster/SKILL.md
+curl -L https://raw.githubusercontent.com/picasso250/pica-skills/main/xhs-browser-poster/scripts/post_to_xhs.py -o ~/.gemini/skills/xhs-browser-poster/scripts/post_to_xhs.py
+curl -L https://raw.githubusercontent.com/picasso250/pica-skills/main/xhs-browser-poster/scripts/generate_gemini_img.py -o ~/.gemini/skills/xhs-browser-poster/scripts/generate_gemini_img.py
+```
+
 ## 📜 License
 MIT
