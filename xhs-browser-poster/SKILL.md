@@ -8,7 +8,6 @@ description: Automates Xiaohongshu (XHS) posting via browser. Includes two robus
 Automate Xiaohongshu publishing with AI-generated images.
 
 ## Prerequisite
-- Browser with remote debugging enabled (`--remote-debugging-port=9222`).
 - User already logged into Xiaohongshu and Gemini.
 
 ## Core Scripts
@@ -35,4 +34,4 @@ python scripts/post_to_xhs.py "image.jpg" "Title" "Content"
 
 ## Best Practices
 - **Hashtags**: Always ensure a space after each hashtag in the content string.
-- **Verification**: The script automatically verifies if the new post title exists in the Note Manager. Check the console output for `VERIFICATION_SUCCESS`.
+- 你应当先使用 skills\xhs-browser-poster\scripts\get_note_manager_data.py 获取管理数据，找到最高浏览量的那条，然后在发布时使用相似的标题和内容，以提高曝光率。
