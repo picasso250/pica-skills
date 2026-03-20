@@ -1,11 +1,6 @@
 import asyncio
-import sys
-import os
 import json
-
-# Adjust the path to import BrowserAgent
-# In production, we might want a more robust way to find this path
-sys.path.append(r'C:\Users\MECHREV\.agents\skills\browser')
+import sys
 from browser_agent import BrowserAgent
 
 async def fetch_notes_data():

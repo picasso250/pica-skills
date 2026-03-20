@@ -1,7 +1,11 @@
 import asyncio
-from playwright.async_api import async_playwright
 import os
 import sys
+from pathlib import Path
+
+from playwright.async_api import async_playwright
+
+SCRIPT_DIR = Path(__file__).resolve().parent
 
 async def run(prompt):
     os.environ["NO_PROXY"] = "localhost,127.0.0.1"
@@ -71,16 +75,16 @@ async def run(prompt):
                         raise Exception("Download button found by selector but query_selector_all returned empty.")
                 
                 download = await download_info.value
-                save_path = os.path.abspath("gemini_generated_output.jpg")
+                save_path = SCRIPT_DIR / "gemini_generated_output.jpg"
                 await download.save_as(save_path)
                 print(f"RESULT_IMAGE_PATH:{save_path}")
             except Exception as e:
                 print(f"Failed to download image: {e}")
-                await page.screenshot(path="gemini_download_fail.png")
+                await page.screenshot(path=SCRIPT_DIR / "gemini_download_fail.png")
             
         except Exception as e:
             print(f"Error in Gemini script: {e}")
-            await page.screenshot(path="gemini_error.png")
+            await page.screenshot(path=SCRIPT_DIR / "gemini_error.png")
         finally:
             await page.close()
 

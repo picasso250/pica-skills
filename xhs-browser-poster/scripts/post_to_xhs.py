@@ -1,8 +1,25 @@
 import asyncio
-from playwright.async_api import async_playwright
 import os
 import sys
 import re
+from pathlib import Path
+
+from playwright.async_api import async_playwright
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+
+
+def resolve_input_path(path_str):
+    path = Path(path_str)
+    if path.is_absolute():
+        return path
+
+    cwd_candidate = Path.cwd() / path
+    if cwd_candidate.exists():
+        return cwd_candidate.resolve()
+
+    script_candidate = SCRIPT_DIR / path
+    return script_candidate.resolve()
 
 def parse_tags(content):
     tags = []
@@ -17,6 +34,11 @@ def parse_tags(content):
 async def run(image_path, title, content):
     if len(title) > 20:
         print(f"Error: Title '{title}' exceeds 20 characters (length: {len(title)}). Please provide a shorter title.")
+        return
+
+    resolved_image_path = resolve_input_path(image_path)
+    if not resolved_image_path.exists():
+        print(f"Error: Image not found: {resolved_image_path}")
         return
 
     os.environ["NO_PROXY"] = "localhost,127.0.0.1"
@@ -34,8 +56,8 @@ async def run(image_path, title, content):
             await page.wait_for_load_state("domcontentloaded")
             await asyncio.sleep(5)
 
-            await page.set_input_files("input[type='file']", os.path.abspath(image_path))
-            print(f"Uploaded image: {image_path}")
+            await page.set_input_files("input[type='file']", str(resolved_image_path))
+            print(f"Uploaded image: {resolved_image_path}")
             await asyncio.sleep(8)
 
             title_input = await page.wait_for_selector("input[placeholder*='填写标题']", timeout=10000)
