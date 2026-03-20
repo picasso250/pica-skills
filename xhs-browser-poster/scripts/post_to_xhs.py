@@ -31,7 +31,8 @@ async def run(image_path, title, content):
 
             print("Opening XHS image publish page directly...")
             await page.goto("https://creator.xiaohongshu.com/publish/publish?from=menu&target=image")
-            await page.wait_for_load_state("networkidle")
+            await page.wait_for_load_state("domcontentloaded")
+            await asyncio.sleep(5)
 
             await page.set_input_files("input[type='file']", os.path.abspath(image_path))
             print(f"Uploaded image: {image_path}")
@@ -151,3 +152,4 @@ if __name__ == "__main__":
         print("Usage: python post_to_xhs.py <image_path> <title> <content>")
     else:
         asyncio.run(run(sys.argv[1], sys.argv[2], sys.argv[3]))
+
