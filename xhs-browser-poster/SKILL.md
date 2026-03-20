@@ -1,6 +1,6 @@
 ---
 name: xhs-browser-poster
-description: Automates Xiaohongshu (XHS) posting via browser. Includes two robust scripts: one for generating high-res images in Gemini (including Tool selection) and one for publishing to XHS and verifying via the Note Manager.
+description: Automates Xiaohongshu (XHS) posting via browser. Includes scripts for generating high-res images in Gemini, publishing to XHS, and reading Note Manager data for content reuse.
 ---
 
 # XHS Browser Poster
@@ -12,7 +12,18 @@ Automate Xiaohongshu publishing with AI-generated images.
 
 ## Core Scripts
 
-### 1. Gemini Image Generation
+### 1. Note Manager Data
+Use `scripts/get_note_manager_data.py` to fetch current Note Manager performance data.
+- **Input**: Optional `--format` flag (`tsv` or `json`).
+- **Workflow**: Opens or reloads the XHS Note Manager page, extracts title, publish date, and engagement metrics from visible notes.
+- **Output**: Prints note data in TSV by default, or JSON when `--format json` is used.
+
+```bash
+python scripts/get_note_manager_data.py
+python scripts/get_note_manager_data.py --format json
+```
+
+### 2. Gemini Image Generation
 Use `scripts/generate_gemini_img.py` to generate and download an image.
 - **Input**: Prompt string.
 - **Workflow**: Navigates to Gemini, clicks "Tools" -> "Create Image", waits 60s for generation, and downloads the high-res file.
@@ -22,7 +33,7 @@ Use `scripts/generate_gemini_img.py` to generate and download an image.
 python scripts/generate_gemini_img.py "A cozy afternoon tea at a street cafe, natural lighting, shot on phone."
 ```
 
-### 2. XHS Posting & Verification
+### 3. XHS Posting & Verification
 Use `scripts/post_to_xhs.py` to publish and verify.
 - **Input**: Image path, Title, and Content.
 - **Workflow**: Navigates to the publish page, uploads image, fills title/content, clicks Publish, and then reloads the Note Manager to confirm the post's presence.
